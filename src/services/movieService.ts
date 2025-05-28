@@ -7,6 +7,7 @@ const myKey = import.meta.env.VITE_TMDB_TOKEN;
 
 interface MoviesHttpResponse {
   results: Movie[];
+  total_page: number;
 }
 export async function fetchMovies(topic: string): Promise<Movie[]> {
   const response = await axios.get<MoviesHttpResponse>(
