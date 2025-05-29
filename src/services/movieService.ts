@@ -7,14 +7,25 @@ const myKey = import.meta.env.VITE_TMDB_TOKEN;
 
 interface MoviesHttpResponse {
   results: Movie[];
-  total_page: number;
+  total_pages: number;
 }
-export async function fetchMovies(topic: string): Promise<Movie[]> {
+
+interface MoviesFatchResult {
+  results: Movie[];
+  totalPages: number;
+}
+export async function fetchMovies(
+  topic: string,
+  page = 1
+): Promise<MoviesFatchResult> {
   const response = await axios.get<MoviesHttpResponse>(
-    `${url}?query=${topic}`,
+    `${url}?query=${topic}&page=${page}`,
     { headers: { Authorization: `Bearer ${myKey}` } }
   );
   console.log(response.data.results);
 
-  return response.data.results;
+  return {
+    results: response.data.results,
+    totalPages: response.data.total_pages,
+  };
 }
