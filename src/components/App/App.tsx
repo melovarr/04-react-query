@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "../SearchBar/SearchBar";
 import type { Movie } from "../../types/movie";
 import MovieGrid from "../MovieGrid/MovieGrid";
@@ -10,18 +10,25 @@ import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import css from "./App.module.css";
 import ReactPaginate from "react-paginate";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 export default function App() {
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isPending, isError, isSuccess } = useQuery({
     queryKey: ["movies", query, currentPage],
     queryFn: () => fetchMovies(query, currentPage),
     enabled: query !== "",
     placeholderData: keepPreviousData,
   });
+
+  useEffect(() => {
+    if (isSuccess && data?.results.length === 0) {
+      toast.error("No movies found for your request.");
+    }
+  }, [isSuccess, data]);
 
   const handleSearch = (searchQuery: string) => {
     if (searchQuery !== query) {
@@ -41,12 +48,12 @@ export default function App() {
   return (
     <>
       <SearchBar onSubmit={handleSearch} />
-      {isLoading && <Loader />}
+      {isPending && <Loader />}
       {isError && <ErrorMessage />}
       {data && data.results.length > 0 && (
         <ReactPaginate
-          previousLabel={"←"}
-          nextLabel={"→"}
+          previousLabel={"<"}
+          nextLabel={">"}
           breakLabel={"..."}
           pageCount={data.totalPages}
           marginPagesDisplayed={1}
