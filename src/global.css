@@ -3,6 +3,10 @@
   margin: 0;
 }
 
+html {
+  cursor: url("../public/bobina.cur"), auto;
+}
+
 img {
   display: block;
   max-width: 100%;
